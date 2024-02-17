@@ -1,79 +1,74 @@
 package sieteymedia;
 import recursos.Carta;
-import java.util.Scanner;
+import java.util.Scanner;;
 
-interface InterfaceConsola {
-    SieteYMedia miSieteYMedia = new SieteYMedia();
-    Scanner sc = new Scanner(System.in);
-
-    //mostramos las cartas del jugador y el texto oportuno
-    default public void mostrarCartasJugador(Carta[] cartas){
-        int i = 0;
-        System.out.println("Éstas son tus cartas jugador:");
-        while (cartas[i] != null) {
-            System.out.print("\t" + cartas[i]);
-            i++;
-        }
-    }
-
-    //mostramos las cartas de la banca y el texto oportuno
-    default public void mostrarCartasBanca(Carta[] cartas){
-        int i = 0;
-        System.out.println("Éstas son mis cartas:");
-        while (cartas[i] != null) {
-            System.out.print("\t" + cartas[i]);
-            i++;
-        }
-        System.out.println("\nValor de  mis cartas(banca): " + miSieteYMedia.valorCartas(cartas));
-    }
-
-    //mostramos valor cartas (jugador o banca) y texto
-    default public void valor_Cartas(Carta[] cartas){
-        double d = miSieteYMedia.valorCartas(cartas);
-        String s = "\n\tValor de cartas: " + d;
-        System.out.println("\n\tValor de cartas: " + d);
-    }
+public class InterfaceConsola{
 
 
-    //comprobamos cual el es valor de las cartas del jugador para permitir que siga pidiendo
-    default public char valorCartasJugador(Carta[] cartas){
-        char op ='p';
-        if(miSieteYMedia.valorCartas(cartas)<7.5){
-                System.out.println("\n¿Pides [C]arta o te [P]lantas?");
-                op = sc.next().trim().toUpperCase().charAt(0);
-                return op;
-        }
-        return op;
-    }
 
-    //comprobamos si el jugador se pasó y sacamos texto y devolvemos un booleano para control desde prog principal
-    default public boolean seHaPasadoJugador(Carta[] cartas){
-        boolean se_paso = false;
-        if(miSieteYMedia.valorCartas(cartas)>7.5){
-                se_paso = true;
-                System.out.println("Jugador, te has pasado en tu jugada anterior, gana la banca");
-        }else{
-                System.out.println("\n\nTurno de banca ...");
-        }
+    public static void main(String[] args) {
         
-        return se_paso;
+        InterfaceConsola ic =  new InterfaceConsola();
+        SieteYMedia sm = new SieteYMedia();
+
+        ic.presentarJuego();
+
+        ic.turnoJugador(sm);
+        ic.turnoBanca(sm);
+
+
     }
-    //comprobamos si se pasó la banca para seguir sacando cartas o no
-    default public void seHaPasadoBanca(Carta[] cartas){
-        if(miSieteYMedia.valorCartas(cartas)>7.5){
-                System.out.println("me pasé, ganas tú,jugador");
-        }else{
-                System.out.println("Gana la banca");
+
+    void turnoJugador(SieteYMedia sm) {
+        char opc = 'C';
+        Scanner sc = new Scanner(System.in);
+        // obligamos a que como mínimo se tenga 1 carta
+        System.out.println("Como mínimo recibes una carta, luego puedes decidir si seguir o plantarte");
+        while (sm.valorCartas(sm.getCartasJugador()) < 7.5 && opc == 'C') {
+            Carta c = sm.getBaraja().darCartas(1)[0];
+            // insertamos c en las cartas del jugador
+            sm.insertarCartaEnArray(sm.getCartasJugador(), c);
+            // mostramos cartas y su valor, si se pasa se sale del bucle
+            System.out.println("Éstas son tus cartas jugador:");
+            sm.mostrarCartas(sm.getCartasJugador());
+            double valor = sm.valorCartas(sm.getCartasJugador());
+            System.out.println("\n\tValor de cartas: " + valor);
+            if (valor < 7.5) {
+                // suponemos que el usuario teclea bien !!!
+                System.out.println("\n¿Pides [C]arta o te [P]lantas?");
+                opc = sc.next().trim().toUpperCase().charAt(0);
+            }
+
+        }
+
+    }
+
+    void turnoBanca(SieteYMedia sm) {
+        // lo primero es consultar el valor que alcanzó el jugador en su turno
+        double valorCartasJugador = sm.valorCartas(sm.getCartasJugador());
+        if (valorCartasJugador > 7.5) {
+            System.out.println("Jugador, te has pasado en tu jugada anterior, gana la banca");
+            return;
+        }
+        System.out.println("\n\nTurno de banca ...");
+
+        // juega hasta empatar o superar
+        while (sm.valorCartas(sm.getCartasBanca()) < valorCartasJugador) {
+            Carta c = sm.getBaraja().darCartas(1)[0];
+            sm.insertarCartaEnArray(sm.getCartasBanca(), c);
+        }
+        System.out.println("Éstas son mis cartas:");
+        sm.mostrarCartas(sm.getCartasBanca());
+        System.out.println("\nValor de  mis cartas(banca): " + sm.valorCartas(sm.getCartasBanca()));
+        if (sm.valorCartas(sm.getCartasBanca()) > 7.5) {
+            System.out.println("me pasé, ganas tú,jugador");
+        } else {
+            System.out.println("Gana la banca");
         }
     }
-    
-    //texto de fin de juego
-    default public void  finDelJuego(){
-        System.out.println("Adios");
-    }
-    
-    //texto de inicio y explicación de juego
-    default public void presentarJuego() {
+
+
+    void presentarJuego() {
         System.out.println("- El usuario es el jugador y el ordenador la  banca.");
         System.out.println("- No hay en la baraja 8s y 9s. El 10 es la sota, el 11 el caballo y el 12 el Rey.");
         System.out.println("- las figuras (10-sota, 11-caballo y 12-rey) valen medio punto y, el resto, su valor.");
@@ -93,5 +88,8 @@ interface InterfaceConsola {
                 "- En este proceso puede ocurrir que la banca 'se pase' y entonces pierde la banca y gana el jugador.");
         System.out.println("\nEmpecemos!!!\n");
     }
+
+
+
 
 }

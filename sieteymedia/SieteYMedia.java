@@ -4,11 +4,10 @@ import java.util.Scanner;
 import recursos.Baraja;
 import recursos.Carta;
 
-public class SieteYMedia implements InterfaceConsola{
-    Baraja baraja;
-    Carta[] cartasJugador;
-    Carta[] cartasBanca;
-    Scanner sc = new Scanner(System.in);
+public class SieteYMedia {
+    private Baraja baraja;
+    private Carta[] cartasJugador;
+    private Carta[] cartasBanca;
 
     public SieteYMedia() {
         baraja = new Baraja();
@@ -21,47 +20,16 @@ public class SieteYMedia implements InterfaceConsola{
         cartasBanca = new Carta[15];
     }
 
-    public static void main(String[] args) {
-        SieteYMedia sm = new SieteYMedia();
-        sm.presentarJuego();
-        sm.jugar();
+    Baraja getBaraja(){
+        return baraja;
     }
 
-    void jugar() {
-        SieteYMedia sm = new SieteYMedia();
-        turnoJugador(sm);
-        turnoBanca(sm);
-        sm.finDelJuego();
+    Carta[] getCartasJugador(){
+        return cartasJugador;
     }
 
-    void turnoJugador(SieteYMedia sm) {
-        char opc = 'C';
-        // obligamos a que como mínimo se tenga 1 carta
-        while (valorCartas(cartasJugador) < 7.5 && opc == 'C') {
-            Carta c = baraja.darCartas(1)[0];
-            // insertamos c en las cartas del jugador
-            insertarCartaEnArray(cartasJugador, c);
-            // mostramos cartas y su valor, si se pasa se sale del bucle
-            mostrarCartasJugador(cartasJugador);
-            sm.valor_Cartas(cartasJugador);
-            //pedimos que teclee opcion si es posible
-            opc=sm.valorCartasJugador(cartasJugador);
-        }
-
-    }
-
-    void turnoBanca(SieteYMedia sm) {
-        // lo primero es consultar el valor que alcanzó el jugador en su turno
-        if(sm.seHaPasadoJugador(cartasJugador)){
-            return;
-        }
-        // juega hasta empatar o superar
-        while (valorCartas(cartasBanca) < valorCartas(cartasJugador)) {
-            Carta c = baraja.darCartas(1)[0];
-            insertarCartaEnArray(cartasBanca, c);
-        }
-        sm.mostrarCartasBanca(cartasBanca);
-        sm.seHaPasadoBanca(cartasBanca);
+    Carta[] getCartasBanca(){
+        return cartasBanca;
     }
 
     double valorCartas(Carta[] cartas) {
@@ -85,6 +53,14 @@ public class SieteYMedia implements InterfaceConsola{
         }
         cartas[i] = c;
 
+    }
+
+    void mostrarCartas(Carta[] cartas) {
+        int i = 0;
+        while (cartas[i] != null) {
+            System.out.print("\t" + cartas[i]);
+            i++;
+        }
     }
 
 }
